@@ -1,27 +1,15 @@
-<!--
-Avoid using this README file for information that is maintained or published elsewhere, e.g.:
+# Overview
 
-* metadata.yaml > published on Charmhub
-* documentation > published on (or linked to from) Charmhub
-* detailed contribution guide > documentation or CONTRIBUTING.md
+This subordinate charm provides the Dell PowerFlex support to the
+[OpenStack Nova Compute service][charm-nova-compute].
 
-Use links instead.
--->
+# Usage
 
-# charm-nova-powerflex
+## Deployment
 
-Charmhub package name: operator-template
-More information: https://charmhub.io/charm-nova-powerflex
+We are assuming a pre-existing OpenStack deployment.
 
-Describe your charm in one or two sentences.
+Deploy nova-compute-powerflex as a subordinate to the nova-compute charm:
 
-## Other resources
-
-<!-- If your charm is documented somewhere else other than Charmhub, provide a link separately. -->
-
-- [Read more](https://example.com)
-
-- [Contributing](CONTRIBUTING.md) <!-- or link to other contribution documentation -->
-
-- See the [Juju SDK documentation](https://juju.is/docs/sdk) for more information about developing and improving charms.
-# nova-compute-powerflex-charm
+    juju deploy --config cinder-config.yaml --resource sdc-deb-package=../EMC-ScaleIO-sdc-4.5-0.287.Ubuntu.22.04.x86_64.deb cinder-powerflex
+    juju integrate nova-compute-powerflex:juju-info nova-compute:juju-info

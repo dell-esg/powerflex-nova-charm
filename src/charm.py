@@ -68,8 +68,9 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         config = dict(self.framework.model.config)
         powerflex_backend = dict(self.powerflex_configuration(config))
         powerflex_config = {}
-        # Get cinder config stanza name.
-        powerflex_config['cinder_name'] = "cinder-powerflex""
+        # Get cinder config stanza name. 
+        # TODO: Get rid of the hardcoded section name. Relation may be needed with cinder?
+        powerflex_config['cinder_name'] = "cinder-powerflex"
         filename = os.path.join(CONNECTOR_DIR, CONNECTOR_FILE)
         ch_core.host.mkdir(CONNECTOR_DIR)
 
@@ -118,9 +119,9 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
                 if service_running("scini"):
                     log("SDC scini service running. SDC Installation complete.")
                 else:
-                    log("SDC scini service has encountered errors while starting", level=ERROR)
+                    log("SDC scini service has encountered errors while starting", level='ERROR')
         else:
-            log("The package required for SDC installation is missing.", level=ERROR)
+            log("The package required for SDC installation is missing.", level='ERROR')
 
 
 if __name__ == '__main__':
