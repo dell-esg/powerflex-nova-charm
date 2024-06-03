@@ -43,7 +43,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.framework.observe(self.on.config_changed, self._on_config_changed)
+        self.framework.observe(self.on.install, self._on_install)
 
     def powerflex_configuration(self, charm_config) -> 'list[tuple]':
         """Returns the PowerFlex configuration to the caller."""
