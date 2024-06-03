@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ops import model
 from ops.main import main
 import ops_openstack.plugins.classes
 
@@ -57,8 +58,8 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         options = [(x, y) for x, y in raw_options if y]
         return options
         
-    def _on_config_changed(self, _):
-        
+    def _on_install(self, event):
+        super().on_install(event)
         self.create_connector()
         self.install_sdc()
         self.update_status()
@@ -122,6 +123,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
                     log("SDC scini service has encountered errors while starting", level='ERROR')
         else:
             log("The package required for SDC installation is missing.", level='ERROR')
+            model.BlockedStatus('SDC package missing')
 
 
 if __name__ == '__main__':
