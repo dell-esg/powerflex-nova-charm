@@ -42,6 +42,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._stored.is_started = True
 
         self.framework.observe(self.on.install, self._on_install)
 
