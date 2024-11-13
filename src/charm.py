@@ -72,7 +72,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         powerflex_config = {}
         # Get cinder config stanza name. 
         # TODO: Get rid of the hardcoded section name. Relation may be needed with cinder?
-        powerflex_config['cinder_name'] = "cinder-powerflex"
+        powerflex_config['cinder_name'] = "cinder-dell-powerflex"
         filename = os.path.join(CONNECTOR_DIR, CONNECTOR_FILE)
         ch_core.host.mkdir(CONNECTOR_DIR)
 
