@@ -1,4 +1,4 @@
-name: nova-compute-powerflex
+name: nova-dell-powerflex
 summary: Dell PowerFlex integration for OpenStack Block Storage
 maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
 description: |
