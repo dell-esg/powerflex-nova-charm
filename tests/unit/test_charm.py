@@ -66,3 +66,29 @@ class TestCharm(unittest.TestCase):
         self.harness.update_config({"log-level": "foobar"})
         # Check the charm is in BlockedStatus
         self.assertIsInstance(self.harness.model.unit.status, ops.BlockedStatus)
+
+    @patch("charmhelpers.core.host.mkdir")
+    @patch("charm.render")
+    def test_create_connector_with_replication(self, _render, _mkdir):
+        """Test the connector renders replication settings."""
+        self.harness.update_config(
+            {
+                "powerflex-replication-config": (
+                    "backendid:acme,san_ip:10.20.30.41,san_login:admin,san_password:password"
+                )
+            }
+        )
+        _render.reset_mock()
+        self.charm.create_connector()
+        _render.assert_called_once_with(
+            source="connector.conf",
+            target="/opt/emc/scaleio/openstack/connector.conf",
+            context={
+                "backends": {
+                    "cinder_name": "cinder-powerflex",
+                    "san_password": "password",
+                    "rep_san_password": "password",
+                }
+            },
+            perms=0o600,
+        )
