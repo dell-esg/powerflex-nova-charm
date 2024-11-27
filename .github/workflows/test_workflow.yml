@@ -1,0 +1,12 @@
+name: Workflow test
+on: workflow_dispatch
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Install dependancies
+        run: npm ci
+      - name: End message
+        run: echo 'All done!'
