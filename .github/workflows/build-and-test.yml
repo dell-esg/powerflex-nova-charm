@@ -40,7 +40,7 @@ jobs:
           channel: 5.20/stable
       - name: Build charm
         id: builder
-        run:
+        run: |
           sudo snap install charmcraft --classic
           charmcraft pack -v
 
