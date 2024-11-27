@@ -26,4 +26,22 @@ jobs:
       - name: Run Unit Tests
         run: tox -e py3
 
+  build:
+    name: Build the charm
+    runs-on: Ubuntu-22.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v0.1.1
+        with:
+          channel: 5.20/stable
+      - name: Build charm
+        id: builder
+        run:
+          sudo snap install charmcraft --classic
+          charmcraft pack -v
+
 
