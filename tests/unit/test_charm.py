@@ -1,7 +1,16 @@
-# Copyright 2024 Jean-Pierre Roquesalane
-# See LICENSE file for licensing details.
+# Copyright 2024 Canonical Ltd
 #
-# Learn more about testing at: https://juju.is/docs/sdk/testing
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 
@@ -66,3 +75,29 @@ class TestCharm(unittest.TestCase):
         self.harness.update_config({"log-level": "foobar"})
         # Check the charm is in BlockedStatus
         self.assertIsInstance(self.harness.model.unit.status, ops.BlockedStatus)
+
+    @patch("charmhelpers.core.host.mkdir")
+    @patch("charm.render")
+    def test_create_connector_with_replication(self, _render, _mkdir):
+        """Test the connector renders replication settings."""
+        self.harness.update_config(
+            {
+                "powerflex-replication-config": (
+                    "backendid:acme,san_ip:10.20.30.41,san_login:admin,san_password:password"
+                )
+            }
+        )
+        _render.reset_mock()
+        self.charm.create_connector()
+        _render.assert_called_once_with(
+            source="connector.conf",
+            target="/opt/emc/scaleio/openstack/connector.conf",
+            context={
+                "backends": {
+                    "cinder_name": "cinder-powerflex",
+                    "san_password": "password",
+                    "rep_san_password": "password",
+                }
+            },
+            perms=0o600,
+        )
