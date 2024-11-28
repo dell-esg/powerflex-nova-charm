@@ -99,7 +99,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         )
 
     def install_sdc(self):
-        """Enable access to the PowerFlex volumes.""" 
+        """Enable access to the PowerFlex volumes."""
         config = dict(self.framework.model.config)
         sdc_package_file = self.model.resources.fetch("sdc-deb-package")
         # Check if the file exists
