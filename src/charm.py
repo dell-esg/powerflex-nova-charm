@@ -41,7 +41,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         self.framework.observe(self.on.install, self._on_install)
 
     def powerflex_configuration(self, charm_config) -> "list[tuple]":
-        """Returns the PowerFlex configuration to the caller."""
+        """Return the PowerFlex configuration to the caller."""
         cget = charm_config.get
 
         raw_options = [
@@ -60,12 +60,12 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         self.update_status()
 
     def create_connector(self):
-        """Create the connector.conf file and populate with data"""
+        """Create the connector.conf file and populate with data."""
         config = dict(self.framework.model.config)
         powerflex_backend = dict(self.powerflex_configuration(config))
         powerflex_config = {}
         # Get cinder config stanza name.
-        # TODO: Get rid of the hardcoded section name. Relation may be needed with cinder?
+        # TODO: Get rid of the hardcoded section name.
         powerflex_config["cinder_name"] = "cinder-dell-powerflex"
         filename = os.path.join(CONNECTOR_DIR, CONNECTOR_FILE)
         ch_core.host.mkdir(CONNECTOR_DIR)
@@ -79,14 +79,16 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         for param in filter_params:
             if param in powerflex_backend:
                 if param == "replication_device":
-                    # Extract the password from the content 'backendid:acme,san_ip:10.20.30.41,san_login:admin,san_password:password'
+                    # Extract the password from the content 
+                    # 'backendid:acme,san_ip:10.20.30.41,san_login:admin,san_password:password'
                     powerflex_config["rep_san_password"] = (
                         powerflex_backend["replication_device"].split(",")[3].split(":")[1]
                     )
                 else:
                     powerflex_config[param] = powerflex_backend[param]
 
-        # Render the templates/connector.conf and create the /opt/emc/scaleio/openstack/connector.conf with root access only
+        # Render the templates/connector.conf and 
+        # create the /opt/emc/scaleio/openstack/connector.conf with root access only
         log("Rendering connector.conf template with config {}".format(powerflex_config))
         rendered_config = render(
             source="connector.conf",
@@ -96,7 +98,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         )
 
     def install_sdc(self):
-        """Install the SDC debian package in order to get access to the PowerFlex volumes"""
+        """Install the SDC debian package in order to get access to the PowerFlex volumes."""
         config = dict(self.framework.model.config)
         sdc_package_file = self.model.resources.fetch("sdc-deb-package")
         # Check if the file exists
