@@ -79,7 +79,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         for param in filter_params:
             if param in powerflex_backend:
                 if param == "replication_device":
-                    # Extract the password from the content 
+                    # Extract the password from the content
                     # 'backendid:acme,san_ip:10.20.30.41,san_login:admin,san_password:password'
                     powerflex_config["rep_san_password"] = (
                         powerflex_backend["replication_device"].split(",")[3].split(":")[1]
@@ -87,7 +87,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
                 else:
                     powerflex_config[param] = powerflex_backend[param]
 
-        # Render the templates/connector.conf and 
+        # Render the templates/connector.conf and
         # create the /opt/emc/scaleio/openstack/connector.conf with root access only
         log("Rendering connector.conf template with config {}".format(powerflex_config))
         rendered_config = render(
@@ -98,7 +98,9 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         )
 
     def install_sdc(self):
-        """Install the SDC debian package in order to get access to the PowerFlex volumes."""
+        """Install the SDC debian package in order
+        to get access to the PowerFlex volumes."""
+        
         config = dict(self.framework.model.config)
         sdc_package_file = self.model.resources.fetch("sdc-deb-package")
         # Check if the file exists
