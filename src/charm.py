@@ -88,9 +88,10 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
                     powerflex_config[param] = powerflex_backend[param]
 
         # Render the templates/connector.conf and
-        # create the /opt/emc/scaleio/openstack/connector.conf with root access only
+        # create the /opt/emc/scaleio/openstack/connector.conf
+        # with root access only.
         log("Rendering connector.conf template with config {}".format(powerflex_config))
-        rendered_config = render(
+        render(
             source="connector.conf",
             target=filename,
             context={"backends": powerflex_config},
@@ -98,7 +99,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         )
 
     def install_sdc(self):
-        """Enable access to the PowerFlex volumes."""    
+        """Enable access to the PowerFlex volumes.""" 
         config = dict(self.framework.model.config)
         sdc_package_file = self.model.resources.fetch("sdc-deb-package")
         # Check if the file exists
