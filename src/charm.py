@@ -32,6 +32,7 @@ CONNECTOR_FILE = "connector.conf"
 
 
 class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
+    """Charm which provides PowerFlex access to Nova."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
