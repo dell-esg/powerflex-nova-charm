@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-
 # Copyright 2024 Canonical Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,20 +18,14 @@ from ops.main import main
 import ops_openstack.plugins.classes
 
 import charmhelpers.core as ch_core
-from charmhelpers.core.hookenv import status_set, log
+from charmhelpers.core.hookenv import log
 
 from charmhelpers.core.templating import render
 from charmhelpers.core.host import service_running
 
-import os, stat
-from pathlib import Path
+import os
+
 import subprocess
-
-import pdb
-import subprocess
-
-import pdb
-
 
 CONNECTOR_DIR = "/opt/emc/scaleio/openstack"
 CONNECTOR_FILE = "connector.conf"
