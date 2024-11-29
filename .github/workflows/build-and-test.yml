@@ -37,7 +37,7 @@ jobs:
       - name: Setup LXD
         uses: canonical/setup-lxd@v0.1.2
         with:
-          channel: 5.20/stable
+          channel: latest/stable
       - name: Build charm
         id: builder
         run: |
