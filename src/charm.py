@@ -111,7 +111,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
             if exit_code != 0:
                 log(
                     "An error occurred during the SDC installation: {}.".format(result.stderr),
-                    level=ERROR,
+                    level="ERROR",
                 )
             else:
                 log("SDC installed successfully, stdout: {}".format(result.stdout))
