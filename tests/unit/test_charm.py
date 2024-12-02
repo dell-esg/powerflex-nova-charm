@@ -16,6 +16,7 @@ import unittest
 
 import ops
 import ops.testing
+
 from charm import CharmNovaPowerflexCharm
 
 
@@ -76,8 +77,8 @@ class TestCharm(unittest.TestCase):
         # Check the charm is in BlockedStatus
         self.assertIsInstance(self.harness.model.unit.status, ops.BlockedStatus)
 
-    @patch("charmhelpers.core.host.mkdir")
-    @patch("charm.render")
+    @patch("charmhelpers.core.host.mkdir") # noqa: F821
+    @patch("charm.render") # noqa: F821
     def test_create_connector_with_replication(self, _render, _mkdir):
         """Test the connector renders replication settings."""
         self.harness.update_config(
