@@ -13,19 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ops import model
-from ops.main import main
-import ops_openstack.plugins.classes
+import os
+import subprocess
 
 import charmhelpers.core as ch_core
+import ops_openstack.plugins.classes
 from charmhelpers.core.hookenv import log
-
-from charmhelpers.core.templating import render
 from charmhelpers.core.host import service_running
+from charmhelpers.core.templating import render
+from ops import model
+from ops.main import main
 
-import os
-
-import subprocess
 
 CONNECTOR_DIR = "/opt/emc/scaleio/openstack"
 CONNECTOR_FILE = "connector.conf"
