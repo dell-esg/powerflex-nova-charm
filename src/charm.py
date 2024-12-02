@@ -24,7 +24,6 @@ from charmhelpers.core.templating import render
 from ops import model
 from ops.main import main
 
-
 CONNECTOR_DIR = "/opt/emc/scaleio/openstack"
 CONNECTOR_FILE = "connector.conf"
 
