@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Charmed operator for Dell PowerFlex Nova access."""
+
 import os
 import subprocess
 
