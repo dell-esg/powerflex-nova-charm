@@ -13,7 +13,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: Ubuntu-22.04
+    runs-on: Ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
         
   unit-test:
     name: Unit tests
-    runs-on: Ubuntu-22.04
+    runs-on: Ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout source code
