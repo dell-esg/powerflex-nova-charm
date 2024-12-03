@@ -5,12 +5,7 @@ on:
 
 jobs:
   release:
-    needs: check
-    runs-on: ${{ matrix.runs-on }}
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [[ubuntu-22.04]]
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
