@@ -17,4 +17,4 @@ jobs:
         with:
           charmcraft-channel: "3.x/stable"
           credentials: "${{ secrets.CHARMHUB_TOKEN }}"
-          # Ensure the charm is built in an isolated environment and on the correct base in an lxd container.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
