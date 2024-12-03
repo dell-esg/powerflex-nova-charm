@@ -33,5 +33,7 @@ jobs:
         run: python -m pip install tox --user tox
       - name: Clear tox cache
         run: export TOX_WORK_DIR=$HOME/.tox
+      - name: Update package lists
+        run: sudo apt-get update
       - name: Run Unit Tests
         run: tox -e unit
