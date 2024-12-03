@@ -1,0 +1,25 @@
+name: Release to Edge
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    needs: check
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [[ubuntu-22.04]]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Pack and upload to charmhub
+        uses: canonical/charming-actions/upload-charm@2.6.2
+        with:
+          charmcraft-channel: "3.x/stable"
+          credentials: "${{ secrets.CHARMHUB_TOKEN }}"
+          # Ensure the charm is built in an isolated environment and on the correct base in an lxd container.
