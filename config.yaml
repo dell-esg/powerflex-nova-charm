@@ -1,0 +1,39 @@
+options:
+  volume-backend-name:
+    type: string
+    default: powerflex
+    description: |
+        Volume backend name for the backend. The default value is the
+        application name in the Juju model, e.g. "cinder-powerflex"
+        if it's deployed as `juju deploy cinder-powerflex`.
+        A common backend name can be set to multiple backends with the
+        same characters so that those can be treated as a single virtual
+        backend associated with a single volume type.
+  powerflexgw-password:
+    type: string
+    default: password
+    description: Password for PowerFlex Gateway user.
+  powerflex-replication-config:
+    type: string
+    default: !!null ""
+    description: |
+        Specific replication configuration settings. Must be set under
+        the form of
+        backend_id:<PowerFlexReplicationDevice>,
+        san_ip: <ReplicationGatewayIP>,
+        san_login: <ReplicationGatewayUser>,
+        san_password: <ReplicationGatewayPassword>
+        Where:
+        - PowerFlexReplicationDevice represents the replication paired
+          between the two systems
+        - ReplicationGatewayIP is the IP of hostname of the remote
+          PowerFlex Gateway
+        - ReplicationGatewayUser is the user of the remote PowerFlex
+          Gateway
+        - ReplicationGatewayPassword is the password used to authenticate
+          to the remote PowerFlex Gateway
+  powerflex-sdc-mdm-ips:
+    type: string
+    default: !!null ""
+    description: list of comma separated MDM IPs used for SDC connection
+

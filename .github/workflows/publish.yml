@@ -1,0 +1,20 @@
+name: Publish charm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Pack and upload to charmhub
+        uses: canonical/charming-actions/upload-charm@2.6.2
+        with:
+          charmcraft-channel: "3.x/stable"
+          credentials: "${{ secrets.CHARMHUB_TOKEN }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
