@@ -1,0 +1,24 @@
+name: nova-dell-powerflex
+summary: Dell PowerFlex integration for OpenStack Block Storage
+maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
+description: |
+  Nova needs to have access to the PowerFlex system in order to
+  use volumes which can be provisioned to instances.
+  This charm configures and enables this functionality.
+tags:
+  - openstack
+  - storage
+  - file-servers
+  - misc
+series:
+  - jammy
+resources:
+  sdc-deb-package:
+    type: file
+    description: debian package file used to install SDC
+    filename: sdc-install-package-for-juju.deb
+subordinate: true
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
