@@ -1,4 +1,4 @@
-name: Release to Edge
+name: Publish charm
 
 on:
   workflow_dispatch:
