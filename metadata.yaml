@@ -5,6 +5,8 @@ description: |
   Nova needs to have access to the PowerFlex system in order to
   use volumes which can be provisioned to instances.
   This charm configures and enables this functionality.
+docs: https://github.com/dell-esg/powerflex-nova-charm/blob/main/README.md
+source: https://github.com/dell-esg/powerflex-nova-charm
 tags:
   - openstack
   - storage
