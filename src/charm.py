@@ -15,6 +15,7 @@
 
 """Charmed operator for Dell PowerFlex Nova access."""
 
+import logging
 import os
 import subprocess
 from pathlib import Path
@@ -22,11 +23,12 @@ from typing import Optional
 
 import ops_openstack.core
 import ops_openstack.plugins.classes
-from charmhelpers.core.hookenv import log
 from charmhelpers.core.host import mkdir, service_running
 from charmhelpers.core.templating import render
 from ops import model
 from ops.main import main
+
+logger = logging.getLogger(__name__)
 
 CONNECTOR_DIR = "/opt/emc/scaleio/openstack"
 CONNECTOR_FILE = "connector.conf"
@@ -145,7 +147,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         # Render the templates/connector.conf and
         # create the /opt/emc/scaleio/openstack/connector.conf
         # with root access only.
-        log("Rendering connector.conf template with config {}".format(powerflex_config))
+        logger.info("Rendering connector.conf template with config %s", str(powerflex_config))
         render(
             source="connector.conf",
             target=filename,
@@ -159,14 +161,14 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         sdc_package_file = self._get_debian_package_path()
         if not sdc_package_file:
             # Note: the user has not provided that debian resource
-            log("The package required for SDC installation is missing.", level="ERROR")
+            logger.error("The package required for SDC installation is missing")
             return
 
         # Get the MDM IP from config file
         sdc_mdm_ips = config["powerflex-sdc-mdm-ips"]
         # Install the SDC package
         install_cmd = f"sudo MDM_IP={sdc_mdm_ips} dpkg -i {sdc_package_file}"
-        log("Installing SDC kernel module with MDM(s) {}".format(sdc_mdm_ips))
+        logger.info("Installing SDC kernel module with MDM(s) %s", sdc_mdm_ips)
         self.model.unit.status = model.MaintenanceStatus("Installing SDC kernel module")
         result = subprocess.run(install_cmd.split(), capture_output=True, text=True)
         exit_code = result.returncode
@@ -176,22 +178,19 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         # an error based on the self._stored.install_failed flag and report the
         # error.
         if exit_code != 0:
-            log(
-                "An error occurred during the SDC installation: {}.".format(result.stderr),
-                level="ERROR",
-            )
+            logger.error("An error occurred during the SDC installation: %s", result.stderr)
             self._stored.installed = False
             self._stored.install_failed = True
             return
 
         self._stored.installed = True
         self._stored.install_failed = False
-        log("SDC installed successfully, stdout: {}".format(result.stdout))
+        logger.info("SDC installed successfully, stdout: %s", result.stdout)
         # Check if service scini is running
         if service_running("scini"):
-            log("SDC scini service running. SDC Installation complete.")
+            logger.info("SDC scini service running. SDC Installation complete.")
         else:
-            log("SDC scini service has encountered errors while starting", level="ERROR")
+            logger.error("SDC scini service has encountered errors while starting")
 
 
 if __name__ == "__main__":
