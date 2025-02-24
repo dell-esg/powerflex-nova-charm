@@ -1,6 +1,6 @@
 name: nova-dell-powerflex
 summary: Dell PowerFlex integration for OpenStack Block Storage
-maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
+maintainer: Dell OpenStack Charmers <openstack@dell.com>
 description: |
   Nova needs to have access to the PowerFlex system in order to
   use volumes which can be provisioned to instances.
