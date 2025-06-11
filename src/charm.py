@@ -17,6 +17,7 @@
 
 import logging
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -46,11 +47,13 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         self._stored.installed = False
         self._stored.install_failed = False
         self._stored.is_started = True
+        self._stored.sdc_package_name = None
 
         self.register_status_check(self.resource_status)
         self.register_status_check(self.install_status)
 
         self.framework.observe(self.on.install, self._on_install)
+        self.framework.observe(self.on.remove, self._on_remove)
 
     def _get_debian_package_path(self) -> Optional[Path]:
         """Return the path to the debian package if it has been provided.
@@ -116,6 +119,20 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         self.install_sdc()
         self.update_status()
 
+    def _on_remove(self, event):
+        """Handle the remove event."""
+        self.remove_connector()
+        if self.uninstall_sdc():
+            # Update the stored state to be tidy, but realistically this won't
+            # end up being used, given that the charm is being removed.
+            self._stored.installed = False
+            self._stored.install_failed = False
+            self._stored.is_started = False
+
+        # Similarly, the status of the unit will only momentarily be relevant,
+        # since the unit is about to be removed, but we update it to be tidy.
+        self.update_status()
+
     def create_connector(self):
         """Create the connector.conf file and populate with data."""
         config = dict(self.framework.model.config)
@@ -155,6 +172,13 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
             perms=0o600,
         )
 
+    def remove_connector(self):
+        """Remove the connector.conf file, if it exists."""
+        connector_file_path = os.path.join(CONNECTOR_DIR, CONNECTOR_FILE)
+        if os.path.exists(connector_file_path):
+            os.remove(connector_file_path)
+            logger.info("Removed connector.conf file at %s", connector_file_path)
+
     def install_sdc(self):
         """Enable access to the PowerFlex volumes."""
         config = dict(self.framework.model.config)
@@ -164,13 +188,25 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
             logger.error("The package required for SDC installation is missing")
             return
 
+        # Store the name of the SDC package for later use.
+        result = subprocess.run(
+            ["dpkg", "--info", str(sdc_package_file)],
+            capture_output=True,
+            text=True,
+        )
+        mo = re.search(r"^\s*Package:\s+(.+?)$", result.stdout, re.MULTILINE)
+        if mo:
+            self._stored.sdc_package_name = mo.group(1)
+        else:
+            logger.warning("Couldn't determine package name from %s", sdc_package_file)
+
         # Get the MDM IP from config file
         sdc_mdm_ips = config["powerflex-sdc-mdm-ips"]
         # Install the SDC package
-        install_cmd = f"sudo MDM_IP={sdc_mdm_ips} dpkg -i {sdc_package_file}"
+        install_cmd = ["sudo", "env", f"MDM_IP={sdc_mdm_ips}", "dpkg", "-i", str(sdc_package_file)]
         logger.info("Installing SDC kernel module with MDM(s) %s", sdc_mdm_ips)
         self.model.unit.status = model.MaintenanceStatus("Installing SDC kernel module")
-        result = subprocess.run(install_cmd.split(), capture_output=True, text=True)
+        result = subprocess.run(install_cmd, capture_output=True, text=True)
         exit_code = result.returncode
 
         # If the installation process failed, then log the error and return
@@ -191,6 +227,26 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
             logger.info("SDC scini service running. SDC Installation complete.")
         else:
             logger.error("SDC scini service has encountered errors while starting")
+
+    def uninstall_sdc(self):
+        """Remove the SDC package if it is installed."""
+        if not self._stored.installed:
+            # Not installed is 'success'.
+            return True
+        if not self._stored.sdc_package_name:
+            logger.error("SDC package name is not stored, cannot remove SDC package")
+            return False
+        remove_cmd = ["sudo", "apt", "remove", "-y", self._stored.sdc_package_name]
+        result = subprocess.run(remove_cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            logger.error("Failed to remove SDC package: %r", result.stderr)
+            # We just exit here: it's not critical that the package is
+            # removed, and we don't want to block the charm removal by
+            # erroring on the remove event. The Juju log will show that the
+            # package removal failed, and the user can take action if needed.
+            return False
+        logger.info("SDC package removed successfully: %r", result.stdout)
+        return True
 
 
 if __name__ == "__main__":
