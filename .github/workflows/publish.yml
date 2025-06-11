@@ -18,3 +18,4 @@ jobs:
           charmcraft-channel: "3.x/stable"
           credentials: "${{ secrets.CHARMHUB_TOKEN }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          channel: "latest/stable"
