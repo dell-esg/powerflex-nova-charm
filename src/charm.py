@@ -203,7 +203,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         # Get the MDM IP from config file
         sdc_mdm_ips = config["powerflex-sdc-mdm-ips"]
         # Install the SDC package
-        install_cmd = ["sudo", "env", f"MDM_IP={sdc_mdm_ips}", "dpkg", "-i", str(sdc_package_file)]
+        install_cmd = ["sudo", f"MDM_IP={sdc_mdm_ips}", "dpkg", "-i", str(sdc_package_file)]
         logger.info("Installing SDC kernel module with MDM(s) %s", sdc_mdm_ips)
         self.model.unit.status = model.MaintenanceStatus("Installing SDC kernel module")
         result = subprocess.run(install_cmd, capture_output=True, text=True)
