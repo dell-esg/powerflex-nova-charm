@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
-# Copyright 2024 Canonical Ltd
+
+ # Copyright 2024 Canonical Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,8 +53,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         self.register_status_check(self.resource_status)
         self.register_status_check(self.install_status)
 
-        self.framework.observe(self.on.install, self._on_install)
-        self.framework.observe(self.on.remove, self._on_remove)
+        self.framework.observe(self.on.remove, self.on_remove)
 
     def _get_debian_package_path(self) -> Optional[Path]:
         """Return the path to the debian package if it has been provided.
@@ -113,13 +113,13 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         options = [(x, y) for x, y in raw_options if y]
         return options
 
-    def _on_install(self, event):
+    def on_install(self, event):
         super().on_install(event)
         self.create_connector()
         self.install_sdc()
         self.update_status()
 
-    def _on_remove(self, event):
+    def on_remove(self, event):
         """Handle the remove event."""
         self.remove_connector()
         if self.uninstall_sdc():

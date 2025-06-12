@@ -35,7 +35,7 @@ class TestCharm(unittest.TestCase):
         self.harness.begin()
         self.charm = self.harness.charm
 
-    def test__on_install(self):
+    def test_on_install(self):
         """Tests on installation the necessary methods are called."""
         # Don't want any actual installations occurring so mock it out
         # Note: this comes from the parent class where we simply don't want
@@ -50,7 +50,7 @@ class TestCharm(unittest.TestCase):
         self.charm.create_connector.assert_called_once()
         self.charm.install_sdc.assert_called_once()
 
-    def test__on_remove(self):
+    def test_on_remove(self):
         """Tests on removal the necessary methods are called."""
         # Don't want any actual installations occurring so mock it out
         # Note: this comes from the parent class where we simply don't want
