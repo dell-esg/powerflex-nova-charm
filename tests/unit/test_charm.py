@@ -35,7 +35,7 @@ class TestCharm(unittest.TestCase):
         self.harness.begin()
         self.charm = self.harness.charm
 
-    def test__on_install(self):
+    def test_on_install(self):
         """Tests on installation the necessary methods are called."""
         # Don't want any actual installations occurring so mock it out
         # Note: this comes from the parent class where we simply don't want
@@ -49,6 +49,20 @@ class TestCharm(unittest.TestCase):
 
         self.charm.create_connector.assert_called_once()
         self.charm.install_sdc.assert_called_once()
+
+    def test_on_remove(self):
+        """Tests on removal the necessary methods are called."""
+        # Don't want any actual installations occurring so mock it out
+        # Note: this comes from the parent class where we simply don't want
+        # it trying to alter system state
+        self.charm.remove_connector = MagicMock()
+        self.charm.uninstall_sdc = MagicMock()
+
+        # Emit the remove hook
+        self.charm.on.remove.emit()
+
+        self.charm.remove_connector.assert_called_once()
+        self.charm.uninstall_sdc.assert_called_once()
 
     @patch("charm.mkdir")
     @patch("charm.render")
@@ -158,4 +172,32 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.charm.unit.status, BlockedStatus("sdc-deb-package resource is missing")
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("os.remove")
+    def test_remove_connector(self, _remove, _exists):
+        """Test the connector removal."""
+        self.charm.remove_connector()
+
+        connecter_config_path = "/opt/emc/scaleio/openstack/connector.conf"
+        _exists.assert_called_once_with(connecter_config_path)
+        _remove.assert_called_once_with(connecter_config_path)
+
+    @patch("subprocess.run")
+    def test_uninstall_sdc(self, _subprocess_run):
+        """Test uninstalling the SDC package."""
+        self.charm._stored.installed = True
+        self.charm._stored.install_failed = False
+        self.charm._stored.sdc_package_name = "sdc-deb-package"
+
+        _subprocess_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+
+        success = self.charm.uninstall_sdc()
+
+        self.assertTrue(success)
+        _subprocess_run.assert_called_once_with(
+            ["sudo", "apt", "remove", "-y", "sdc-deb-package"],
+            capture_output=True,
+            text=True,
         )
