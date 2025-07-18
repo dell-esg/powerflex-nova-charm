@@ -114,6 +114,7 @@ class NovaComputePowerFlexCharm(ops_openstack.core.OSBaseCharm):
         return options
 
     def on_install(self, event):
+        """Handle the install event."""
         super().on_install(event)
         self.create_connector()
         self.install_sdc()
