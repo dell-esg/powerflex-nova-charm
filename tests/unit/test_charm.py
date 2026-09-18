@@ -116,7 +116,11 @@ class TestCharm(unittest.TestCase):
         self.charm.install_pkgs = MagicMock()
         self.charm.create_connector = MagicMock()
 
-        _subprocess_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        _subprocess_run.side_effect = [
+            MagicMock(returncode=0, stdout="Package: sdc-package\n", stderr=""),
+            MagicMock(returncode=0, stdout="", stderr=""),
+            MagicMock(returncode=0, stdout="install ok installed", stderr=""),
+        ]
         _ch_service_running.return_value = True
         _service_running.return_value = True
 
@@ -134,7 +138,11 @@ class TestCharm(unittest.TestCase):
         self.charm.install_pkgs = MagicMock()
         self.charm.create_connector = MagicMock()
 
-        _subprocess_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        _subprocess_run.side_effect = [
+            MagicMock(returncode=0, stdout="Package: sdc-package\n", stderr=""),
+            MagicMock(returncode=0, stdout="", stderr=""),
+            MagicMock(returncode=0, stdout="install ok installed", stderr=""),
+        ]
         _ch_service_running.return_value = False
         _service_running.return_value = False
 
@@ -152,7 +160,11 @@ class TestCharm(unittest.TestCase):
         self.charm.install_pkgs = MagicMock()
         self.charm.create_connector = MagicMock()
 
-        _subprocess_run.return_value = MagicMock(returncode=128, stdout="", stderr="Error")
+        _subprocess_run.side_effect = [
+            MagicMock(returncode=0, stdout="Package: sdc-package\n", stderr=""),
+            MagicMock(returncode=128, stdout="", stderr="Error"),
+            MagicMock(returncode=1, stdout="", stderr=""),
+        ]
 
         _service_running.return_value = False
 
@@ -172,6 +184,31 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.charm.unit.status, BlockedStatus("sdc-deb-package resource is missing")
+        )
+
+    @patch("subprocess.run")
+    def test_install_status_checks_dpkg(self, _subprocess_run):
+        """Test installed status is determined from dpkg."""
+        self.charm._stored.sdc_package_name = "sdc-package"
+        _subprocess_run.return_value = MagicMock(
+            returncode=0, stdout="install ok installed", stderr=""
+        )
+
+        self.assertIsInstance(self.charm.install_status(), ActiveStatus)
+        _subprocess_run.assert_called_once_with(
+            ["dpkg-query", "--show", "--showformat=${Status}", "sdc-package"],
+            capture_output=True,
+            text=True,
+        )
+
+    @patch("subprocess.run")
+    def test_install_status_reports_missing_package(self, _subprocess_run):
+        """Test status is blocked when dpkg reports the package is missing."""
+        self.charm._stored.sdc_package_name = "sdc-package"
+        _subprocess_run.return_value = MagicMock(returncode=1, stdout="", stderr="")
+
+        self.assertEqual(
+            self.charm.install_status(), BlockedStatus("SDC Debian package is not installed")
         )
 
     @patch("os.path.exists", return_value=True)
